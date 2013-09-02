@@ -6,10 +6,8 @@
 
 
 #include <string>       // для работы с std::string
-
-#include <stdio.h>      // для работы с FILE
-//#include <sys\stat.h> // для чтения размера файла
- #include <sys/stat.h>  // linux-стиль
+#include <stdio.h>      
+#include <sys/stat.h>  
 
 #ifdef nvl_use_vclstring
 typedef AnsiString MString;
@@ -20,11 +18,9 @@ typedef std::string MString;
 
 #ifdef nvl_use_winapi
     #include <windows.h>
-    //#include <winnt.h>
-    //#include <winuser.h>
 #else
     #include <stdlib.h>
-    #include <mem.h>     // для memset
+    #include <mem.h>   
 #endif
 
 
@@ -72,9 +68,9 @@ class MyBString // analog of StringBuilder
   void grow(int snewsize)
   {
     char* ncs = new char[snewsize];
-    memset(ncs, '\0',snewsize);         // заполнение нулями;
-    if(cstr){ memcpy(ncs, cstr, size);  // копирование в новую из старой
-              delete cstr;              // удаление старой;
+    memset(ncs, '\0',snewsize);         
+    if(cstr){ memcpy(ncs, cstr, size);  
+              delete cstr;              
             };
     cstr = ncs;
     size= snewsize;
@@ -85,8 +81,8 @@ class MyBString // analog of StringBuilder
   {
     last+=l;
     if(last >= size)
-          { int nsize = size*2; // +k;
-            while (last >= nsize) nsize*=2; //  +=k;
+          { int nsize = size*2; 
+            while (last >= nsize) nsize*=2;
             grow(nsize);    // str.SetLength(size);
           };
     return last;
@@ -101,7 +97,7 @@ class MyBString // analog of StringBuilder
      if(startsize!=size)
      { if(cstr) delete cstr;
         size = startsize;
-        cstr = new char[startsize]; // str.SetLength(k);
+        cstr = new char[startsize];
      };
      memset(cstr, '\0', size);
    };
@@ -119,10 +115,10 @@ class MyBString // analog of StringBuilder
   #ifdef nvl_use_vcl
   // запись строки (копированием фрагмента памяти):
   MyBString* operator+=(AnsiString s)
-     { int l = s.Length(); if(l==0) return this; // это важно!
+     { int l = s.Length(); if(l==0) return this; 
        int ll = last;
        IncLast(l);
-       memcpy(cstr+ll, s.c_str(), l); // for(int i=1; i<=l; i++) str[ll+i]=s[i];
+       memcpy(cstr+ll, s.c_str(), l); 
        return this;
      };
   #endif
@@ -131,25 +127,25 @@ class MyBString // analog of StringBuilder
      { int l = s.length();
        int ll = last;
        IncLast(l);
-       memcpy(cstr+ll, s.c_str(), l); // for(int i=1; i<=l; i++) str[ll+i]=s[i];
+       memcpy(cstr+ll, s.c_str(), l); 
        return this;
      };
 
   MyBString* operator+=(MyBString bs)
-     { int l = bs.last; //s.length();
+     { int l = bs.last;;
        int ll = last;
        IncLast(l);
-       memcpy(cstr+ll, bs.cstr, l); // for(int i=1; i<=l; i++) str[ll+i]=s[i];
+       memcpy(cstr+ll, bs.cstr, l); 
        cstr[last] = '\0'; // перестраховка, вообще 0 там ещё из memset в grow
        return this;
      };
 
   MyBString* operator+=(char* str)
      {
-       int l = strlen(str); // 0; char c = str[0]; while(c!='\0') { l++; c=str[l]; };
+       int l = strlen(str); 
        int ll = last;
        IncLast(l);
-       memcpy(cstr+ll, str, l); // for(int i=1; i<=l; i++) str[ll+i]=s[i];
+       memcpy(cstr+ll, str, l); 
        return this;
      };
 
@@ -300,11 +296,6 @@ class MyBString // analog of StringBuilder
 
  MyBString& operator<<(MyBString &mb, bool i);
 
-// Комментарий к перегрузке операций записи типа operator<<(MyBString &mb, int i)
-// Эти штуки нужны, чтобы у компилятора не возникал конфликт. Дело в том, что когда
-// он видит что-то типа mb<<4, он не знает что нужно делать - вызывать ли базовый метод
-// для записи числа в поток, либо перекрытый, для записи в поток String-а,
-// предварительно 4-ку в этот самый String преобразовав.
 
 
  // Неоднозначные операции:
